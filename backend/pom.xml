@@ -67,7 +67,7 @@
         <jjwt.version>0.13.0</jjwt.version>
 
         <!-- Testing -->
-        <testcontainers.version>1.20.4</testcontainers.version>
+        <testcontainers.version>2.0.3</testcontainers.version>
         <archunit.version>1.4.1</archunit.version>
 
         <!-- Code Quality -->
