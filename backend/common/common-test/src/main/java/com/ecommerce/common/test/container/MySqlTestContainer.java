@@ -13,6 +13,10 @@ public abstract class MySqlTestContainer {
 
     private static final MySQLContainer<?> MYSQL_CONTAINER;
 
+    protected MySqlTestContainer() {
+        // Protected constructor for abstract class
+    }
+
     static {
         MYSQL_CONTAINER = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
                 .withDatabaseName("testdb")

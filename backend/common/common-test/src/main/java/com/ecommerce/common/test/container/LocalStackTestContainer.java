@@ -14,6 +14,10 @@ public abstract class LocalStackTestContainer {
 
     private static final LocalStackContainer LOCALSTACK_CONTAINER;
 
+    protected LocalStackTestContainer() {
+        // Protected constructor for abstract class
+    }
+
     static {
         LOCALSTACK_CONTAINER = new LocalStackContainer(
                 DockerImageName.parse("localstack/localstack:3.0"))

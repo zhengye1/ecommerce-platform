@@ -12,6 +12,10 @@ public abstract class RedisTestContainer {
 
     private static final GenericContainer<?> REDIS_CONTAINER;
 
+    protected RedisTestContainer() {
+        // Protected constructor for abstract class
+    }
+
     static {
         REDIS_CONTAINER = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
                 .withExposedPorts(6379)

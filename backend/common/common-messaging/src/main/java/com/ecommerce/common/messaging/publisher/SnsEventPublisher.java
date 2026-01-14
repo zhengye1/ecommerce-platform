@@ -24,6 +24,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SnsEventPublisher implements EventPublisher {
 
+    private static final String DATA_TYPE_STRING = "String";
+
     private final SnsClient snsClient;
 
     @Value("${app.messaging.sns.topic-arn-prefix:}")
@@ -83,23 +85,23 @@ public class SnsEventPublisher implements EventPublisher {
         Map<String, MessageAttributeValue> attributes = new HashMap<>();
 
         attributes.put("eventType", MessageAttributeValue.builder()
-                .dataType("String")
+                .dataType(DATA_TYPE_STRING)
                 .stringValue(event.getEventType())
                 .build());
 
         attributes.put("aggregateType", MessageAttributeValue.builder()
-                .dataType("String")
+                .dataType(DATA_TYPE_STRING)
                 .stringValue(event.getAggregateType())
                 .build());
 
         attributes.put("source", MessageAttributeValue.builder()
-                .dataType("String")
+                .dataType(DATA_TYPE_STRING)
                 .stringValue(serviceName)
                 .build());
 
         if (event.getCorrelationId() != null) {
             attributes.put("correlationId", MessageAttributeValue.builder()
-                    .dataType("String")
+                    .dataType(DATA_TYPE_STRING)
                     .stringValue(event.getCorrelationId())
                     .build());
         }
