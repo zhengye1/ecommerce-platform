@@ -20,6 +20,11 @@ public abstract class CleanArchitectureRules {
     private static final String LAYER_INFRASTRUCTURE = "Infrastructure";
     private static final String LAYER_CONFIG = "Config";
 
+    // Package pattern constants
+    private static final String PKG_DOMAIN = "..domain..";
+    private static final String PKG_INFRASTRUCTURE = "..infrastructure..";
+    private static final String PKG_APPLICATION = "..application..";
+
     /**
      * Protected constructor for abstract class.
      */
@@ -42,13 +47,13 @@ public abstract class CleanArchitectureRules {
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_infrastructure = noClasses()
-            .that().resideInAPackage("..domain..")
-            .should().dependOnClassesThat().resideInAPackage("..infrastructure..");
+            .that().resideInAPackage(PKG_DOMAIN)
+            .should().dependOnClassesThat().resideInAPackage(PKG_INFRASTRUCTURE);
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_application = noClasses()
-            .that().resideInAPackage("..domain..")
-            .should().dependOnClassesThat().resideInAPackage("..application..");
+            .that().resideInAPackage(PKG_DOMAIN)
+            .should().dependOnClassesThat().resideInAPackage(PKG_APPLICATION);
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_spring = noClasses()
