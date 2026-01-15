@@ -57,10 +57,11 @@
             <artifactId>testcontainers-localstack</artifactId>
         </dependency>
 
-        <!-- ArchUnit for architecture tests -->
+        <!-- ArchUnit for architecture tests (override test scope from parent) -->
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Awaitility for async testing -->
