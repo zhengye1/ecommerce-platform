@@ -1,7 +1,5 @@
 package com.ecommerce.common.test.architecture;
 
-import com.tngtech.archunit.core.importer.ImportOption;
-import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
@@ -15,18 +13,32 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
  */
 public abstract class CleanArchitectureRules {
 
+    // Layer name constants
+    private static final String LAYER_API = "API";
+    private static final String LAYER_APPLICATION = "Application";
+    private static final String LAYER_DOMAIN = "Domain";
+    private static final String LAYER_INFRASTRUCTURE = "Infrastructure";
+    private static final String LAYER_CONFIG = "Config";
+
+    /**
+     * Protected constructor for abstract class.
+     */
+    protected CleanArchitectureRules() {
+        // Protected constructor to prevent direct instantiation
+    }
+
     @ArchTest
     public static final ArchRule layer_dependencies_are_respected = layeredArchitecture()
             .consideringAllDependencies()
-            .layer("API").definedBy("..api..")
-            .layer("Application").definedBy("..application..")
-            .layer("Domain").definedBy("..domain..")
-            .layer("Infrastructure").definedBy("..infrastructure..")
-            .layer("Config").definedBy("..config..")
-            .whereLayer("API").mayOnlyBeAccessedByLayers("Config")
-            .whereLayer("Application").mayOnlyBeAccessedByLayers("API", "Config", "Infrastructure")
-            .whereLayer("Domain").mayOnlyBeAccessedByLayers("Application", "Infrastructure", "API", "Config")
-            .whereLayer("Infrastructure").mayOnlyBeAccessedByLayers("Config");
+            .layer(LAYER_API).definedBy("..api..")
+            .layer(LAYER_APPLICATION).definedBy("..application..")
+            .layer(LAYER_DOMAIN).definedBy("..domain..")
+            .layer(LAYER_INFRASTRUCTURE).definedBy("..infrastructure..")
+            .layer(LAYER_CONFIG).definedBy("..config..")
+            .whereLayer(LAYER_API).mayOnlyBeAccessedByLayers(LAYER_CONFIG)
+            .whereLayer(LAYER_APPLICATION).mayOnlyBeAccessedByLayers(LAYER_API, LAYER_CONFIG, LAYER_INFRASTRUCTURE)
+            .whereLayer(LAYER_DOMAIN).mayOnlyBeAccessedByLayers(LAYER_APPLICATION, LAYER_INFRASTRUCTURE, LAYER_API, LAYER_CONFIG)
+            .whereLayer(LAYER_INFRASTRUCTURE).mayOnlyBeAccessedByLayers(LAYER_CONFIG);
 
     @ArchTest
     public static final ArchRule domain_should_not_depend_on_infrastructure = noClasses()
