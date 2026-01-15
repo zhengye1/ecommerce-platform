@@ -6,10 +6,14 @@ import com.ecommerce.product.application.mapper.ProductMapper;
 import com.ecommerce.product.application.usecase.CreateProductUseCase;
 import com.ecommerce.product.domain.exception.CategoryNotFoundException;
 import com.ecommerce.product.domain.exception.DuplicateSkuException;
+import com.ecommerce.product.domain.exception.SellerNotVerifiedException;
+import com.ecommerce.product.domain.exception.SellerNotFoundException;
 import com.ecommerce.product.domain.model.Category;
 import com.ecommerce.product.domain.model.Product;
+import com.ecommerce.product.domain.model.Seller;
 import com.ecommerce.product.domain.repository.CategoryRepository;
 import com.ecommerce.product.domain.repository.ProductRepository;
+import com.ecommerce.product.domain.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,16 +35,22 @@ public class CreateProductUseCaseImpl implements CreateProductUseCase {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final SellerRepository sellerRepository;
     private final ProductMapper productMapper;
 
     @Override
     public ProductResponse execute(CreateProductRequest request) {
-        // TODO: Add custom validation logic here
-        // e.g., validate price is positive, SKU format matches pattern, etc.
-
         // Check for duplicate SKU
         if (productRepository.existsBySku(request.getSku())) {
             throw new DuplicateSkuException(request.getSku());
+        }
+
+        // Validate seller exists and is verified
+        Seller seller = sellerRepository.findById(request.getSellerId())
+                .orElseThrow(() -> new SellerNotFoundException(request.getSellerId()));
+
+        if (!seller.canListProducts()) {
+            throw new SellerNotVerifiedException(request.getSellerId());
         }
 
         // Resolve category if provided
@@ -56,7 +66,8 @@ public class CreateProductUseCaseImpl implements CreateProductUseCase {
                 request.getName(),
                 request.getDescription(),
                 request.getPrice(),
-                category
+                category,
+                seller.getId()
         );
 
         // TODO: Set additional fields from request

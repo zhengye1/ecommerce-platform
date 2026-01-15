@@ -46,6 +46,9 @@ public class Product extends AggregateRoot {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Column(name = "seller_id", nullable = false)
+    private UUID sellerId;
+
     @Column(name = "brand")
     private String brand;
 
@@ -85,7 +88,7 @@ public class Product extends AggregateRoot {
      * Create a new product.
      */
     public static Product create(String sku, String name, String description,
-                                  BigDecimal price, Category category) {
+                                  BigDecimal price, Category category, UUID sellerId) {
         Product product = Product.builder()
                 .id(UUID.randomUUID())
                 .sku(sku)
@@ -93,6 +96,7 @@ public class Product extends AggregateRoot {
                 .description(description)
                 .price(price)
                 .category(category)
+                .sellerId(sellerId)
                 .status(ProductStatus.DRAFT)
                 .build();
 

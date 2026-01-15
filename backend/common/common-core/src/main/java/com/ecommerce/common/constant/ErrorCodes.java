@@ -32,6 +32,8 @@ public final class ErrorCodes {
     public static final String PRODUCT_OUT_OF_STOCK = "ERR_3002";
     public static final String PRODUCT_INACTIVE = "ERR_3003";
     public static final String CATEGORY_NOT_FOUND = "ERR_3100";
+    public static final String SELLER_NOT_FOUND = "ERR_3200";
+    public static final String SELLER_NOT_VERIFIED = "ERR_3201";
 
     // ============ Order Errors (4000-4999) ============
     public static final String ORDER_NOT_FOUND = "ERR_4000";

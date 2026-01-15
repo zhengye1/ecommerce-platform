@@ -8,8 +8,11 @@ import com.ecommerce.product.application.usecase.impl.CreateProductUseCaseImpl;
 import com.ecommerce.product.domain.model.Product;
 import com.ecommerce.product.domain.model.ProductStatus;
 import com.ecommerce.product.domain.model.Category;
+import com.ecommerce.product.domain.model.Seller;
+import com.ecommerce.product.domain.model.SellerStatus;
 import com.ecommerce.product.domain.repository.CategoryRepository;
 import com.ecommerce.product.domain.repository.ProductRepository;
+import com.ecommerce.product.domain.repository.SellerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +37,9 @@ class CreateProductUseCaseTest extends BaseUnitTest {
     private CategoryRepository categoryRepository;
 
     @Mock
+    private SellerRepository sellerRepository;
+
+    @Mock
     private ProductMapper productMapper;
 
     @InjectMocks
@@ -43,10 +49,12 @@ class CreateProductUseCaseTest extends BaseUnitTest {
     private Product savedProduct;
     private ProductResponse expectedResponse;
     private UUID categoryId;
+    private UUID sellerId;
 
     @BeforeEach
     void setUp() {
         categoryId = UUID.randomUUID();
+        sellerId = UUID.randomUUID();
 
         request = new CreateProductRequest();
         request.setName("Test Product");
@@ -54,11 +62,21 @@ class CreateProductUseCaseTest extends BaseUnitTest {
         request.setSku("TEST-SKU-001");
         request.setPrice(new BigDecimal("99.99"));
         request.setCategoryId(categoryId);
+        request.setSellerId(sellerId);
 
         // Mock category exists
         Category category = Category.builder().name("Test Category").build();
         category.setId(categoryId);
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+
+        // Mock seller exists and is verified
+        Seller seller = Seller.builder()
+                .userId(UUID.randomUUID())
+                .shopName("Test Shop")
+                .status(SellerStatus.VERIFIED)
+                .build();
+        seller.setId(sellerId);
+        when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(seller));
 
         savedProduct = Product.builder()
                 .id(UUID.randomUUID())
@@ -66,6 +84,7 @@ class CreateProductUseCaseTest extends BaseUnitTest {
                 .description("Test Description")
                 .sku("TEST-SKU-001")
                 .price(new BigDecimal("99.99"))
+                .sellerId(sellerId)
                 .status(ProductStatus.DRAFT)
                 .build();
 

@@ -42,6 +42,9 @@ public class CreateProductRequest {
 
     private UUID categoryId;
 
+    @NotNull(message = "Seller ID is required")
+    private UUID sellerId;
+
     @Size(max = 100, message = "Brand must not exceed 100 characters")
     private String brand;
 
