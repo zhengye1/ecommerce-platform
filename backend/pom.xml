@@ -274,25 +274,22 @@
                         <excludes>
                             <!-- Application entry points -->
                             <exclude>**/*Application.class</exclude>
-                            <!-- Configuration classes -->
+                            <!-- Configuration classes (Spring annotations only) -->
                             <exclude>**/config/**</exclude>
                             <!-- DTOs (no logic, Lombok generated) -->
                             <exclude>**/dto/**</exclude>
-                            <!-- Domain models (mostly Lombok) -->
+                            <!-- Domain models (mostly Lombok getters/setters) -->
                             <exclude>**/domain/model/**</exclude>
+                            <!-- Domain events (simple POJOs) -->
                             <exclude>**/domain/event/**</exclude>
-                            <!-- JPA entities (infrastructure) -->
+                            <!-- JPA entities in infrastructure -->
                             <exclude>**/infrastructure/persistence/entity/**</exclude>
-                            <!-- MapStruct mappers (generated) -->
+                            <!-- MapStruct mappers (generated code) -->
                             <exclude>**/*MapperImpl.class</exclude>
-                            <!-- Exceptions (simple classes) -->
+                            <!-- Exception classes (simple) -->
                             <exclude>**/exception/**</exclude>
-                            <!-- Infrastructure adapters (repositories, messaging) -->
-                            <exclude>**/infrastructure/**</exclude>
-                            <!-- API controllers (integration tested separately) -->
-                            <exclude>**/api/**</exclude>
-                            <!-- Domain services (tested via UseCases) -->
-                            <exclude>**/domain/service/**</exclude>
+                            <!-- Domain repository interfaces (no implementation) -->
+                            <exclude>**/domain/repository/**</exclude>
                         </excludes>
                     </configuration>
                     <executions>
