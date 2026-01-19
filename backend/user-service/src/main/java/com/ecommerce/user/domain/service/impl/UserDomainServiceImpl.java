@@ -129,9 +129,4 @@ public class UserDomainServiceImpl implements UserDomainService {
         return userRepository.save(user);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isEmailRegistered(String email) {
-        return userRepository.existsByEmail(email);
-    }
 }

@@ -94,6 +94,14 @@ public class UserController {
         return ApiResponse.success(userMapper.toResponse(user), "User activated successfully");
     }
 
+    @PutMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Deactivate user account (Admin only)")
+    public ApiResponse<UserResponse> deactivateUser(@PathVariable UUID id) {
+        User user = userDomainService.deactivateUser(id);
+        return ApiResponse.success(userMapper.toResponse(user), "User deactivated successfully");
+    }
+
     @PutMapping("/{id}/suspend")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Suspend user account (Admin only)")
