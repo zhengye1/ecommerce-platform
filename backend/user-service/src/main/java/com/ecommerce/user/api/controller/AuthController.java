@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * Authentication controller for login, register, logout.
  */
@@ -85,11 +87,29 @@ public class AuthController {
     @PostMapping("/refresh")
     @Operation(summary = "Refresh access token")
     public ApiResponse<AuthResponse> refreshToken(@RequestHeader("X-Refresh-Token") String refreshToken) {
-        // TODO: Implement refresh token logic
         // 1. Validate refresh token
+        if (!jwtTokenProvider.validateToken(refreshToken)){
+            log.warn("Invalid refresh token provided");
+            throw new InvalidCredentialsException("Invalid refresh token");
+        }
         // 2. Check if not blacklisted
-        // 3. Generate new access token
-        throw new UnsupportedOperationException("Refresh token not implemented yet");
+        if (tokenBlacklistService.isBlacklisted(refreshToken)){
+            log.warn("Blacklisted refresh token used");
+            throw new InvalidCredentialsException("Refresh token has been revoked");
+        }
+        // 3. Get user from token
+        UUID userId = jwtTokenProvider.getUserIdFromToken(refreshToken);
+        User user = userDomainService.getUserById(userId)
+                .orElseThrow(() -> new InvalidCredentialsException("User not found"));
+
+        // 4. Check user is still active
+        if (!user.isActive()){
+            log.warn("Inactive user attempted to refresh token: {}", userId);
+            throw new InvalidCredentialsException("User account is disabled");
+        }
+        // 5. Generate new token and return response
+        log.info("Token refreshed for user: {}", userId);
+        return ApiResponse.success(createAuthResponse(user), "Token refreshed successfully");
     }
 
     private AuthResponse createAuthResponse(User user) {

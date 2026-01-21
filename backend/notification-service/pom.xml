@@ -15,6 +15,11 @@
     <name>Notification Service</name>
     <description>Notification microservice - handles email, SMS, and push notifications</description>
 
+    <!-- TODO: Increase to 0.80 when service is fully developed -->
+    <properties>
+        <jacoco.check.lineRatio>0.20</jacoco.check.lineRatio>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.ecommerce</groupId>

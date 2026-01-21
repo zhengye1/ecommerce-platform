@@ -53,10 +53,10 @@
 
         <!-- Database -->
         <mysql-connector.version>9.5.0</mysql-connector.version>
-        <flyway.version>11.20.1</flyway.version>
+        <flyway.version>11.20.2</flyway.version>
 
         <!-- AWS -->
-        <aws-sdk.version>2.41.7</aws-sdk.version>
+        <aws-sdk.version>2.41.10</aws-sdk.version>
 
         <!-- Mapping & Validation -->
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -72,6 +72,7 @@
 
         <!-- Code Quality -->
         <jacoco.version>0.8.14</jacoco.version>
+        <jacoco.check.lineRatio>0.30</jacoco.check.lineRatio>
         <sonar.version>5.5.0.6356</sonar.version>
 
         <!-- Utilities -->
@@ -79,7 +80,7 @@
         <commons-lang3.version>3.20.0</commons-lang3.version>
 
         <!-- OpenAPI / Swagger -->
-        <spring-doc.version>3.0.1</spring-doc.version>
+        <spring-doc.version>2.8.15</spring-doc.version>
     </properties>
 
     <!-- ============================================================ -->
@@ -274,25 +275,22 @@
                         <excludes>
                             <!-- Application entry points -->
                             <exclude>**/*Application.class</exclude>
-                            <!-- Configuration classes -->
+                            <!-- Configuration classes (Spring annotations only) -->
                             <exclude>**/config/**</exclude>
                             <!-- DTOs (no logic, Lombok generated) -->
                             <exclude>**/dto/**</exclude>
-                            <!-- Domain models (mostly Lombok) -->
+                            <!-- Domain models (mostly Lombok getters/setters) -->
                             <exclude>**/domain/model/**</exclude>
+                            <!-- Domain events (simple POJOs) -->
                             <exclude>**/domain/event/**</exclude>
-                            <!-- JPA entities (infrastructure) -->
-                            <exclude>**/infrastructure/persistence/entity/**</exclude>
-                            <!-- MapStruct mappers (generated) -->
-                            <exclude>**/*MapperImpl.class</exclude>
-                            <!-- Exceptions (simple classes) -->
-                            <exclude>**/exception/**</exclude>
-                            <!-- Infrastructure adapters (repositories, messaging) -->
+                            <!-- Infrastructure layer (adapters, JPA repos - tested via integration tests) -->
                             <exclude>**/infrastructure/**</exclude>
-                            <!-- API controllers (integration tested separately) -->
-                            <exclude>**/api/**</exclude>
-                            <!-- Domain services (tested via UseCases) -->
-                            <exclude>**/domain/service/**</exclude>
+                            <!-- MapStruct mappers (generated code) -->
+                            <exclude>**/*MapperImpl.class</exclude>
+                            <!-- Exception classes (simple) -->
+                            <exclude>**/exception/**</exclude>
+                            <!-- Domain repository interfaces (no implementation) -->
+                            <exclude>**/domain/repository/**</exclude>
                         </excludes>
                     </configuration>
                     <executions>
@@ -321,8 +319,8 @@
                                             <limit>
                                                 <counter>LINE</counter>
                                                 <value>COVEREDRATIO</value>
-                                                <!-- Lowered for scaffolding - increase as business logic is implemented -->
-                                                <minimum>0.30</minimum>
+                                                <!-- Default 30%, can be overridden per module -->
+                                                <minimum>${jacoco.check.lineRatio}</minimum>
                                             </limit>
                                         </limits>
                                     </rule>

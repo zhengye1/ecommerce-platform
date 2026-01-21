@@ -58,8 +58,4 @@ public interface UserDomainService {
      */
     User suspendUser(UUID userId);
 
-    /**
-     * Check if email is already registered.
-     */
-    boolean isEmailRegistered(String email);
 }

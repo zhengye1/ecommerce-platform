@@ -39,7 +39,7 @@ class UserDomainServiceTest extends BaseUnitTest {
     private UserDomainServiceImpl userDomainService;
 
     private static final String TEST_EMAIL = "test@example.com";
-    private static final String TEST_PASSWORD = "password123";
+    private static final String TEST_PASSWORD = "Password123!";
     private static final String TEST_ENCODED_PASSWORD = "encoded_password";
     private static final String TEST_FIRST_NAME = "John";
     private static final String TEST_LAST_NAME = "Doe";
@@ -238,6 +238,171 @@ class UserDomainServiceTest extends BaseUnitTest {
             // When & Then
             assertThatThrownBy(() -> userDomainService.changePassword(userId, "wrongPassword", "newPassword"))
                     .isInstanceOf(InvalidCredentialsException.class);
+        }
+
+        @Test
+        @DisplayName("should throw InvalidCredentialsException when current password is same as new one")
+        void shouldThrowExceptionWhenOldPasswordIsSameAsNewPassword() {
+            // Given
+            when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+            when(passwordEncoder.matches(TEST_PASSWORD, TEST_ENCODED_PASSWORD)).thenReturn(true);
+
+            // When & Then
+            assertThatThrownBy(() -> userDomainService.changePassword(userId, TEST_PASSWORD, TEST_PASSWORD))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
+    }
+    @Nested
+    @DisplayName("retrieve user")
+    class UserService{
+        private User existingUser;
+        private UUID userId;
+        @BeforeEach
+        void setUp() {
+            userId = UUID.randomUUID();
+            existingUser = User.builder()
+                    .email(TEST_EMAIL)
+                    .passwordHash(TEST_ENCODED_PASSWORD)
+                    .firstName(TEST_FIRST_NAME)
+                    .lastName(TEST_LAST_NAME)
+                    .status(UserStatus.ACTIVE)
+                    .role(Role.CUSTOMER)
+                    .build();
+            existingUser.setId(userId);
+        }
+
+        @Test
+        @DisplayName("Find the user by userId")
+        void shouldReturnUserFromUserId(){
+            // Given
+            when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+            // When
+            Optional<User> result = userDomainService.getUserById(userId);
+
+            assertThat(result).isPresent();
+            assertThat(result.get()).isEqualTo(existingUser);
+            assertThat(result.get().getId()).isEqualTo(userId);
+        }
+
+        @Test
+        @DisplayName("Find the user by email")
+        void shouldReturnUserFromEmail(){
+            // Given
+            when(userRepository.findByEmail(existingUser.getEmail())).thenReturn(Optional.of(existingUser));
+
+            // When
+            Optional<User> result = userDomainService.getUserByEmail(TEST_EMAIL);
+
+            assertThat(result).isPresent();
+            assertThat(result.get()).isEqualTo(existingUser);
+            assertThat(result.get().getEmail()).isEqualTo(TEST_EMAIL);
+        }
+    }
+
+    @Nested
+    @DisplayName("change user status")
+    class UserStatusTest{
+        private User existingUser;
+        private UUID userId;
+        @BeforeEach
+        void setUp() {
+            userId = UUID.randomUUID();
+            existingUser = User.builder()
+                    .email(TEST_EMAIL)
+                    .passwordHash(TEST_ENCODED_PASSWORD)
+                    .firstName(TEST_FIRST_NAME)
+                    .lastName(TEST_LAST_NAME)
+                    .status(UserStatus.ACTIVE)
+                    .role(Role.CUSTOMER)
+                    .build();
+            existingUser.setId(userId);
+        }
+
+        @Test
+        @DisplayName("activate user")
+        void userShouldActivated(){
+            // Given
+            existingUser.setStatus(UserStatus.INACTIVE);
+            when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+            // When
+            userDomainService.activateUser(userId);
+
+            // Then
+            verify(userRepository).findById(userId);
+            assertThat(existingUser.getStatus()).isEqualTo(UserStatus.ACTIVE);
+            verify(userRepository).save(any(User.class));
+        }
+
+        @Test
+        @DisplayName("deactivate user")
+        void userShouldDeactivated(){
+            // Given
+            existingUser.setStatus(UserStatus.ACTIVE);
+            when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+            // When
+            userDomainService.deactivateUser(userId);
+
+            // Then
+            verify(userRepository).findById(userId);
+            assertThat(existingUser.getStatus()).isEqualTo(UserStatus.INACTIVE);
+            verify(userRepository).save(any(User.class));
+        }
+
+        @Test
+        @DisplayName("suspend user")
+        void userShouldSuspend(){
+            // When
+            existingUser.setStatus(UserStatus.ACTIVE);
+            when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+            // Given
+            userDomainService.suspendUser(userId);
+
+            // Then
+            verify(userRepository).findById(userId);
+            assertThat(existingUser.getStatus()).isEqualTo(UserStatus.SUSPENDED);
+            verify(userRepository).save(any(User.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("user profile")
+    class UserProfileTest{
+        private User existingUser;
+        private UUID userId;
+        @BeforeEach
+        void setUp() {
+            userId = UUID.randomUUID();
+            existingUser = User.builder()
+                    .email(TEST_EMAIL)
+                    .passwordHash(TEST_ENCODED_PASSWORD)
+                    .firstName(TEST_FIRST_NAME)
+                    .lastName(TEST_LAST_NAME)
+                    .status(UserStatus.ACTIVE)
+                    .role(Role.CUSTOMER)
+                    .build();
+            existingUser.setId(userId);
+        }
+
+        @Test
+        @DisplayName("update user profile")
+        void profileShouldUpdate(){
+            // When
+            when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+            // Given
+            userDomainService.updateProfile(userId, "NewFirst", "NewLast", "NewPhone");
+
+            // Then
+            verify(userRepository).findById(userId);
+            assertThat(existingUser.getFirstName()).isEqualTo("NewFirst");
+            assertThat(existingUser.getLastName()).isEqualTo("NewLast");
+            assertThat(existingUser.getPhone()).isEqualTo("NewPhone");
+            verify(userRepository).save(any(User.class));
+
         }
     }
 }

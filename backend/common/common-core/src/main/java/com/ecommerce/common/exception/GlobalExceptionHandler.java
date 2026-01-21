@@ -1,5 +1,6 @@
 package com.ecommerce.common.exception;
 
+import com.ecommerce.common.constant.ErrorCodes;
 import com.ecommerce.common.response.ApiResponse;
 import com.ecommerce.common.response.ErrorDetails;
 import jakarta.servlet.http.HttpServletRequest;
@@ -103,6 +104,12 @@ public class GlobalExceptionHandler {
 
         log.error("Business error: {}", ex.getMessage());
 
+        // Check if this is an authentication error (return 401)
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        if (ErrorCodes.USER_INVALID_CREDENTIALS.equals(ex.getErrorCode())) {
+            status = HttpStatus.UNAUTHORIZED;
+        }
+
         ErrorDetails error = ErrorDetails.builder()
                 .code(ex.getErrorCode())
                 .message(ex.getMessage())
@@ -110,7 +117,7 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(status)
                 .body(ApiResponse.error(error));
     }
 
