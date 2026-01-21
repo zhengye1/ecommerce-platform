@@ -72,6 +72,7 @@
 
         <!-- Code Quality -->
         <jacoco.version>0.8.14</jacoco.version>
+        <jacoco.check.lineRatio>0.30</jacoco.check.lineRatio>
         <sonar.version>5.5.0.6356</sonar.version>
 
         <!-- Utilities -->
@@ -318,8 +319,8 @@
                                             <limit>
                                                 <counter>LINE</counter>
                                                 <value>COVEREDRATIO</value>
-                                                <!-- Lowered for scaffolding - increase as business logic is implemented -->
-                                                <minimum>0.30</minimum>
+                                                <!-- Default 30%, can be overridden per module -->
+                                                <minimum>${jacoco.check.lineRatio}</minimum>
                                             </limit>
                                         </limits>
                                     </rule>
