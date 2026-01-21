@@ -160,7 +160,6 @@ public class UserControllerTest {
         }
     }
 
-    // TODO: 你可以继续加:
     // - PUT /api/v1/users/me (update profile)
     @Nested
     @DisplayName("PUT /api/v1/users/me")
