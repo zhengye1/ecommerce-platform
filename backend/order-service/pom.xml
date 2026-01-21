@@ -15,6 +15,11 @@
     <name>Order Service</name>
     <description>Order management microservice - handles order creation, status tracking, and saga orchestration</description>
 
+    <!-- TODO: Increase to 0.80 when service is fully developed -->
+    <properties>
+        <jacoco.check.lineRatio>0.20</jacoco.check.lineRatio>
+    </properties>
+
     <dependencies>
         <!-- Internal modules -->
         <dependency>

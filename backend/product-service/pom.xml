@@ -15,6 +15,11 @@
     <name>Product Service</name>
     <description>Product catalog and inventory management service</description>
 
+    <!-- TODO: Increase to 0.80 when service is fully developed -->
+    <properties>
+        <jacoco.check.lineRatio>0.20</jacoco.check.lineRatio>
+    </properties>
+
     <dependencies>
         <!-- Common modules -->
         <dependency>

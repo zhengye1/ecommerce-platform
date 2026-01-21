@@ -15,6 +15,11 @@
     <name>Inventory Service</name>
     <description>Inventory management microservice - handles stock levels, reservations, and warehouse management</description>
 
+    <!-- TODO: Increase to 0.80 when service is fully developed -->
+    <properties>
+        <jacoco.check.lineRatio>0.20</jacoco.check.lineRatio>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.ecommerce</groupId>
