@@ -53,10 +53,10 @@
 
         <!-- Database -->
         <mysql-connector.version>9.5.0</mysql-connector.version>
-        <flyway.version>11.20.1</flyway.version>
+        <flyway.version>11.20.2</flyway.version>
 
         <!-- AWS -->
-        <aws-sdk.version>2.41.7</aws-sdk.version>
+        <aws-sdk.version>2.41.10</aws-sdk.version>
 
         <!-- Mapping & Validation -->
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -282,8 +282,8 @@
                             <exclude>**/domain/model/**</exclude>
                             <!-- Domain events (simple POJOs) -->
                             <exclude>**/domain/event/**</exclude>
-                            <!-- JPA entities in infrastructure -->
-                            <exclude>**/infrastructure/persistence/entity/**</exclude>
+                            <!-- Infrastructure layer (adapters, JPA repos - tested via integration tests) -->
+                            <exclude>**/infrastructure/**</exclude>
                             <!-- MapStruct mappers (generated code) -->
                             <exclude>**/*MapperImpl.class</exclude>
                             <!-- Exception classes (simple) -->

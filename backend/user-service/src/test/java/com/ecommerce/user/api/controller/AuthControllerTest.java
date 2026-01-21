@@ -8,7 +8,6 @@ import com.ecommerce.user.application.dto.request.LoginRequest;
 import com.ecommerce.user.application.dto.request.RegisterRequest;
 import com.ecommerce.user.application.mapper.UserMapper;
 import com.ecommerce.user.domain.exception.DuplicateEmailException;
-import com.ecommerce.user.domain.exception.InvalidCredentialsException;
 import com.ecommerce.user.domain.model.Role;
 import com.ecommerce.user.domain.model.User;
 import com.ecommerce.user.domain.model.UserStatus;
@@ -32,14 +31,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Controller tests for AuthController.
- *
  * 呢个test用 @WebMvcTest - 只load controller layer，mock晒dependencies。
  * 适合test: request validation, response format, HTTP status codes
  */
@@ -103,7 +104,7 @@ class AuthControllerTest {
             // Given
             RegisterRequest request = new RegisterRequest();
             request.setEmail("newuser@example.com");
-            request.setPassword("password123");
+            request.setPassword("Pass@123");
             request.setFirstName("Jane");
             request.setLastName("Doe");
 
@@ -123,7 +124,8 @@ class AuthControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.success").value(true))
                     .andExpect(jsonPath("$.data.accessToken").value("mock_access_token"))
-                    .andExpect(jsonPath("$.data.refreshToken").value("mock_refresh_token"));
+                    .andExpect(jsonPath("$.data.refreshToken").value("mock_refresh_token"))
+                    .andExpect(jsonPath("$.message").value("Registration successful"));
         }
 
         @Test
@@ -132,7 +134,7 @@ class AuthControllerTest {
             // Given - invalid email format
             RegisterRequest request = new RegisterRequest();
             request.setEmail("not-an-email");  // Invalid!
-            request.setPassword("password123");
+            request.setPassword("Pass@123");
             request.setFirstName("Jane");
             request.setLastName("Doe");
 
@@ -158,7 +160,115 @@ class AuthControllerTest {
             mockMvc.perform(post("/api/v1/auth/register")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(
+                            jsonPath("$.error.fieldErrors.password").value("Password must be 8-12 characters with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"));
+        }
+        @Test
+        @DisplayName("should return 400 when password too long")
+        void shouldReturn400WhenPasswordTooLong() throws Exception {
+            // Given
+            RegisterRequest request = new RegisterRequest();
+            request.setEmail("test@example.com");
+            request.setPassword("1234567890abc");  // Too Long! (min 12)
+            request.setFirstName("Jane");
+            request.setLastName("Doe");
+
+            mockMvc.perform(post("/api/v1/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(
+                            jsonPath("$.error.fieldErrors.password").value("Password must be 8-12 characters with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"));
+        }
+
+        @Test
+        @DisplayName("should return 400 when password missing letter")
+        void shouldReturn400WhenPasswordMissingLetter() throws Exception {
+            // Given
+            RegisterRequest request = new RegisterRequest();
+            request.setEmail("test@example.com");
+            request.setPassword("12345678");  // Too Long! (min 12)
+            request.setFirstName("Jane");
+            request.setLastName("Doe");
+
+            mockMvc.perform(post("/api/v1/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(
+                            jsonPath("$.error.fieldErrors.password").value("Password must be 8-12 characters with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"));
+        }
+        @Test
+        @DisplayName("should return 400 when password missing digit")
+        void shouldReturn400WhenPasswordMissingDigit() throws Exception {
+            // Given
+            RegisterRequest request = new RegisterRequest();
+            request.setEmail("test@example.com");
+            request.setPassword("ABCDEFGH");  // missing digit
+            request.setFirstName("Jane");
+            request.setLastName("Doe");
+
+            mockMvc.perform(post("/api/v1/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(
+                            jsonPath("$.error.fieldErrors.password").value("Password must be 8-12 characters with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"));
+        }
+
+        @Test
+        @DisplayName("should return 400 when password missing lower case")
+        void shouldReturn400WhenPasswordMissingLowerCase() throws Exception {
+            // Given
+            RegisterRequest request = new RegisterRequest();
+            request.setEmail("test@example.com");
+            request.setPassword("ABCD123!");  // missing lower
+            request.setFirstName("Jane");
+            request.setLastName("Doe");
+
+            mockMvc.perform(post("/api/v1/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(
+                            jsonPath("$.error.fieldErrors.password").value("Password must be 8-12 characters with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"));
+        }
+
+        @Test
+        @DisplayName("should return 400 when password missing upper case")
+        void shouldReturn400WhenPasswordMissingUpperCase() throws Exception {
+            // Given
+            RegisterRequest request = new RegisterRequest();
+            request.setEmail("test@example.com");
+            request.setPassword("abcd123!");  // missing upper
+            request.setFirstName("Jane");
+            request.setLastName("Doe");
+
+            mockMvc.perform(post("/api/v1/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(
+                            jsonPath("$.error.fieldErrors.password").value("Password must be 8-12 characters with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"));
+        }
+
+        @Test
+        @DisplayName("should return 400 when password missing symbol")
+        void shouldReturn400WhenPasswordMissingSymbol() throws Exception {
+            // Given
+            RegisterRequest request = new RegisterRequest();
+            request.setEmail("test@example.com");
+            request.setPassword("Abcd1234");  // missing lower
+            request.setFirstName("Jane");
+            request.setLastName("Doe");
+
+            mockMvc.perform(post("/api/v1/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(
+                            jsonPath("$.error.fieldErrors.password").value("Password must be 8-12 characters with at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"));
         }
 
         @Test
@@ -167,7 +277,7 @@ class AuthControllerTest {
             // Given
             RegisterRequest request = new RegisterRequest();
             request.setEmail("existing@example.com");
-            request.setPassword("password123");
+            request.setPassword("Pass@123");
             request.setFirstName("Jane");
             request.setLastName("Doe");
 
@@ -195,7 +305,7 @@ class AuthControllerTest {
             // Given
             LoginRequest request = new LoginRequest();
             request.setEmail("test@example.com");
-            request.setPassword("password123");
+            request.setPassword("Pass@123");
 
             when(userDomainService.authenticate(anyString(), anyString()))
                     .thenReturn(Optional.of(testUser));

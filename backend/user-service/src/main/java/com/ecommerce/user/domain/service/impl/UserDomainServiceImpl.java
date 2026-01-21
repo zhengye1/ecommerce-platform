@@ -92,7 +92,12 @@ public class UserDomainServiceImpl implements UserDomainService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
-            throw new InvalidCredentialsException();
+            throw new InvalidCredentialsException("Current password is incorrect");
+        }
+
+        // Check new password is different from current
+        if (currentPassword.equals(newPassword)) {
+            throw new InvalidCredentialsException("New password must be different from current password");
         }
 
         String newPasswordHash = passwordEncoder.encode(newPassword);

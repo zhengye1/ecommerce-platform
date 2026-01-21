@@ -39,7 +39,7 @@ class UserDomainServiceTest extends BaseUnitTest {
     private UserDomainServiceImpl userDomainService;
 
     private static final String TEST_EMAIL = "test@example.com";
-    private static final String TEST_PASSWORD = "password123";
+    private static final String TEST_PASSWORD = "Password123!";
     private static final String TEST_ENCODED_PASSWORD = "encoded_password";
     private static final String TEST_FIRST_NAME = "John";
     private static final String TEST_LAST_NAME = "Doe";
@@ -239,6 +239,18 @@ class UserDomainServiceTest extends BaseUnitTest {
             assertThatThrownBy(() -> userDomainService.changePassword(userId, "wrongPassword", "newPassword"))
                     .isInstanceOf(InvalidCredentialsException.class);
         }
+
+        @Test
+        @DisplayName("should throw InvalidCredentialsException when current password is same as new one")
+        void shouldThrowExceptionWhenOldPasswordIsSameAsNewPassword() {
+            // Given
+            when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+            when(passwordEncoder.matches(TEST_PASSWORD, TEST_ENCODED_PASSWORD)).thenReturn(true);
+
+            // When & Then
+            assertThatThrownBy(() -> userDomainService.changePassword(userId, TEST_PASSWORD, TEST_PASSWORD))
+                    .isInstanceOf(InvalidCredentialsException.class);
+        }
     }
     @Nested
     @DisplayName("retrieve user")
@@ -310,11 +322,11 @@ class UserDomainServiceTest extends BaseUnitTest {
         @Test
         @DisplayName("activate user")
         void userShouldActivated(){
-            // When
+            // Given
             existingUser.setStatus(UserStatus.INACTIVE);
             when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
-            // Given
+            // When
             userDomainService.activateUser(userId);
 
             // Then
@@ -326,11 +338,11 @@ class UserDomainServiceTest extends BaseUnitTest {
         @Test
         @DisplayName("deactivate user")
         void userShouldDeactivated(){
-            // When
+            // Given
             existingUser.setStatus(UserStatus.ACTIVE);
             when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
-            // Given
+            // When
             userDomainService.deactivateUser(userId);
 
             // Then
