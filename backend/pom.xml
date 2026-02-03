@@ -52,7 +52,7 @@
         <spring-cloud.version>2025.1.0</spring-cloud.version>
 
         <!-- Database -->
-        <mysql-connector.version>9.5.0</mysql-connector.version>
+        <mysql-connector.version>9.6.0</mysql-connector.version>
         <flyway.version>11.20.2</flyway.version>
 
         <!-- AWS -->
