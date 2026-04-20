@@ -68,7 +68,7 @@
 
         <!-- Testing -->
         <testcontainers.version>2.0.3</testcontainers.version>
-        <archunit.version>1.4.1</archunit.version>
+        <archunit.version>1.4.2</archunit.version>
 
         <!-- Code Quality -->
         <jacoco.version>0.8.14</jacoco.version>
