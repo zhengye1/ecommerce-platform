@@ -73,7 +73,7 @@
         <!-- Code Quality -->
         <jacoco.version>0.8.14</jacoco.version>
         <jacoco.check.lineRatio>0.30</jacoco.check.lineRatio>
-        <sonar.version>5.5.0.6356</sonar.version>
+        <sonar.version>5.6.0.6792</sonar.version>
 
         <!-- Utilities -->
         <guava.version>33.5.0-jre</guava.version>
